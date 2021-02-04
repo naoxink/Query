@@ -122,6 +122,7 @@ class Query {
   public function insert($table, $fields = [], $values = []){
     $this->type = 'INSERT';
     $this->fields = $fields;
+    $this->table = $table;
     $this->values = $values;
     $this->cleanLimit();
     return $this;
