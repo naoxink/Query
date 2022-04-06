@@ -109,6 +109,7 @@ class Query {
     $this->fields = $fields;
     $this->table = $table;
     $this->where = $where;
+    $this->cleanLimit();
     return $this;
   }
 
