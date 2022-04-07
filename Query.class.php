@@ -75,6 +75,12 @@ class Query {
   private $joins = [];
 
   /**
+   * Condiciones del HAVING
+   * @var array
+   */
+  private $having = [];
+
+  /**
    * Tipos soportados
    * @var [string]
    */
