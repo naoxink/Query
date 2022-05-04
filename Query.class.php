@@ -322,7 +322,7 @@ class Query {
    */
   public function page($page){
     if($page < 1 || !$this->limit) return $this;
-    $this->howMany = ($page - 1) * $this->limit // La primera página es la 1
+    $this->howMany = ($page - 1) * $this->limit; // La primera página es la 1
     return $this;
   }
 
