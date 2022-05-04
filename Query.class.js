@@ -24,7 +24,7 @@ const Query = function(){
     this.table = table
     this.where = where
     this._cleanLimit()
-    return this._outputInterface()
+    return this._interface
   }
 
    this._insert = (table, fields = [], values = []) => {
@@ -33,56 +33,56 @@ const Query = function(){
     this.fields = fields
     this.values = values
     this._cleanLimit()
-    return this._outputInterface()
+    return this._interface
   }
 
   this._delete = (table) => {
     this.type = 'DELETE'
     this.table = table
     this._cleanLimit()
-    return this._outputInterface()
+    return this._interface
   }
 
   this._update = (table) => {
     this.type = 'UPDATE'
     this.table = table
     this._cleanLimit()
-    return this._outputInterface()
+    return this._interface
   }
 
   this._set = (data) => {
     this.set = data
-    return this._outputInterface()
+    return this._interface
   }
 
   this._from = (table = '') => {
     this.table = table
-    return this._outputInterface()
+    return this._interface
   }
 
   this._where = (conditions = []) => {
     this.where = conditions
-    return this._outputInterface()
+    return this._interface
   }
 
   this._andWhere = (conditions = []) => {
     this.where = [...this.where, ...conditions]
-    return this._outputInterface()
+    return this._interface
   }
 
   this._values = (values = []) => {
     this.values = values
-    return this._outputInterface()
+    return this._interface
   }
 
   this._fields = (fields) => {
     this.fields = fields
-    return this._outputInterface()
+    return this._interface
   }
 
   this._having = (having) => {
     this.having = having
-    return this._outputInterface()
+    return this._interface
   }
 
   this._getQuery = () => {
@@ -91,19 +91,19 @@ const Query = function(){
 
   this._limit = (from, howMany = null) => {
     this._cleanLimit()
-    if(!isNaN(from)) this.limit = +from
-    if(!isNaN(howMany)) this.howMany = +howMany
-    return this._outputInterface()
+    if(from && !isNaN(from)) this.limit = +from
+    if(howMany && !isNaN(howMany)) this.howMany = +howMany
+    return this._interface
   }
 
   this._orderBy = (order) => {
     this.order = order
-    return this._outputInterface()
+    return this._interface
   }
 
   this._groupBy = (group) => {
     this.group = group
-    return this._outputInterface()
+    return this._interface
   }
 
   this._join = (joinType = '', table = '', on = null) => {
@@ -111,28 +111,28 @@ const Query = function(){
       this.joins[joinType] = {}
     }
     this.joins[joinType][table] = Array.isArray(on) ? on : null
-    return this._outputInterface()
+    return this._interface
   }
 
   this._innerJoin = (table, on = null) => {
     this._join('INNER', table, on)
-    return this._outputInterface()
+    return this._interface
   }
 
   this._leftJoin = (table, on = null) => {
     this._join('LEFT', table, on)
-    return this._outputInterface()
+    return this._interface
   }
 
   this._rightJoin = (table, on = null) => {
     this._join('RIGHT', table, on)
-    return this._outputInterface()
+    return this._interface
   }
 
   this._cleanLimit = () => {
     this.limit = null
     this.howMany = null
-    return this._outputInterface()
+    return this._interface
   }
 
   this._buildQuery = () => {
@@ -174,8 +174,8 @@ const Query = function(){
   }
 
   this._addLimit = () => {
-    if(this.limit !== null) this.query += ` LIMIT ${this.limit}`
-    if(this.limit !== null && this.howMany !== null) this.query += `, ${this.howMany}`
+    if(this.limit !== null && this.howMany !== null) this.query += `LIMIT ${this.howMany}, ${this.limit}`
+    else if(this.limit !== null) this.query += ` LIMIT ${this.limit}`
     return this.query
   }
 
@@ -230,8 +230,13 @@ const Query = function(){
     return this.query
   }
 
-  this._outputInterface = () => {
-    return {
+  this._page = (page) => {
+    if(!this.limit || page < 1) return this._interface
+    this.howMany = (page - 1) * this.limit // La primera página es la 1
+    return this._interface
+  }
+
+  this._interface = {
       select: this._select,
       insert: this._insert,
       delete: this._delete,
@@ -252,10 +257,10 @@ const Query = function(){
       leftJoin: this._leftJoin,
       rightJoin: this._rightJoin,
       cleanLimit: this._cleanLimit,
+      page: this._page,
     }
-  }
 
-  return this._outputInterface()
+  return this._interface
 }
 
 
