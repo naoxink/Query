@@ -316,6 +316,17 @@ class Query {
   }
 
   /**
+   * Página de resultados (autocálculo de offset)
+   * @param  integer $page Número de página (empieza por 1)
+   * @return object        Instancia actual Query
+   */
+  public function page($page){
+    if($page < 1 || !$this->limit) return $this;
+    $this->howMany = ($page - 1) * $this->limit // La primera página es la 1
+    return $this;
+  }
+
+  /**
    * Limpia el límite de la consulta actual
    * @return object Instancia actual Query
    */
@@ -388,8 +399,8 @@ class Query {
    * @return string Consulta
    */
   private function addLimit(){
-    if($this->limit !== null) $this->query .= ' LIMIT ' . $this->limit;
-    if($this->limit !== null && $this->howMany !== null) $this->query .= ', ' . $this->howMany;
+    if($this->limit !== null && $this->howMany !== null) $this->query .= 'LIMIT ' . $this->howMany . ', ' . $this->limit;
+    else if($this->limit !== null) $this->query .= ' LIMIT ' . $this->limit;
     return $this->query;
   }
 
