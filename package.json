@@ -1,0 +1,25 @@
+{
+  "name": "querysqljs",
+  "version": "1.0.1",
+  "description": "Make your SQL queries easier!",
+  "main": "Query.class.js",
+  "scripts": {
+    "test": "node Query.class.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/naoxink/Query.git"
+  },
+  "keywords": [
+    "mysql",
+    "nodejs",
+    "javascript",
+    "query"
+  ],
+  "author": "naoxink",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/naoxink/Query/issues"
+  },
+  "homepage": "https://github.com/naoxink/Query#readme"
+}
