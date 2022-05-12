@@ -112,7 +112,7 @@ class Query {
    */
   public function select($fields = [], $table = '', $where = []){
     $this->type = 'SELECT';
-    $this->fields = $fields;
+    $this->addFields($fields);
     $this->table = $table;
     $this->where = $where;
     $this->cleanLimit();
@@ -128,7 +128,7 @@ class Query {
    */
   public function insert($table, $fields = [], $values = []){
     $this->type = 'INSERT';
-    $this->fields = $fields;
+    $this->addFields($fields);
     $this->table = $table;
     $this->values = $values;
     $this->cleanLimit();
@@ -182,6 +182,7 @@ class Query {
    * @return object             Instancia actual Query
    */
   public function where($conditions = []){
+    if(is_string($conditions)) $conditions = [$conditions];
     $this->where = $conditions;
     return $this;
   }
@@ -192,6 +193,7 @@ class Query {
    * @return object             Instancia actual Query
    */
   public function andWhere($conditions = []){
+    if(is_string($conditions)) $conditions = [$conditions];
     $this->where = array_merge($this->where, $conditions);
     return $this;
   }
@@ -212,7 +214,7 @@ class Query {
    * @return object        Instancia actual Query
    */
   public function fields($fields){
-    $this->fields = $fields;
+    $this->addFields($fields);
     return $this;
   }
 
@@ -222,6 +224,7 @@ class Query {
    * @return object        Instancia actual Query
    */
   public function having($having){
+    if(is_string($having)) $having = [$having];
     $this->having = $having;
     return $this;
   }
@@ -253,6 +256,7 @@ class Query {
    * @return object       Instancia actual Query
    */
   public function orderBy($order){
+    if(is_string($order)) $order = [$order];
     $this->order = $order;
     return $this;
   }
@@ -263,6 +267,7 @@ class Query {
    * @return object       Instancia actual Query
    */
   public function groupBy($group){
+    if(is_string($group)) $group = [$group];
     $this->group = $group;
     return $this;
   }
@@ -471,6 +476,22 @@ class Query {
     }
     $this->query .= ' ORDER BY ' . implode(', ', $this->order);
     return $this->query;
+  }
+
+  /**
+   * Establece los campos a seleccionar
+   * @param mixed $fields Campos
+   */
+  private function addFields($fields){
+    if(is_string($fields)){
+      $this->fields = array_map(function($f){
+        return trim($f);
+      }, explode(',', $fields));
+    }else if(is_array($fields)){
+      $this->fields = $fields;
+    }else{
+      throw new Exception("Error: invalid fields format", 1);
+    }
   }
 
 } // Fin class Query

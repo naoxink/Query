@@ -3,15 +3,15 @@
 require 'Query.class.php';
 
 $q = new Query();
-$q->select([ 'id', 'nombre' ])
-  ->from('usuarios u')
-  ->join('INNER', 'datos_usuarios d', [ 'u.id = d.id_usuario' ])
-  ->where([ 'edad > 30', 'pelo = "marrón"' ])
-  ->andWhere([ 'nombre = "maikel"' ])
-  ->orderBy([ 'nombre ASC' ])
-  ->groupBy([ 'edad' ])
-  ->having([ 'edad > 3' ])
-  ->limit(2, 10);
+// $q->select([ 'id', 'nombre' ])
+//   ->from('usuarios u')
+//   ->join('INNER', 'datos_usuarios d', [ 'u.id = d.id_usuario' ])
+//   ->where([ 'edad > 30', 'pelo = "marrón"' ])
+//   ->andWhere([ 'nombre = "maikel"' ])
+//   ->orderBy([ 'nombre ASC' ])
+//   ->groupBy([ 'edad' ])
+//   ->having([ 'edad > 3' ])
+//   ->limit(2, 10);
 
 // $q->insert('usuarios')
 //   ->fields([ 'id', 'nombre' ])
@@ -26,6 +26,13 @@ $q->select([ 'id', 'nombre' ])
 //   ->set([ 'edad = 50' ])
 //   ->where([ 'id = 2' ])
 //   ->limit(1);
+
+$q->select('id, nombre, edad')
+  ->from('usuarios')
+  ->where('edad > 18')
+  ->orderBy('id')
+  ->groupBy('edad')
+  ->having('id > 2');
 
 echo $q->getQuery() . "\n\n";
 die();

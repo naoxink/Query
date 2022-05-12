@@ -20,7 +20,7 @@ const Query = function(){
 
   this._select = (fields = [], table = '', where = []) => {
     this.type = 'SELECT'
-    this.fields = fields
+    this._addFields(fields)
     this.table = table
     this.where = where
     this._cleanLimit()
@@ -30,7 +30,7 @@ const Query = function(){
    this._insert = (table, fields = [], values = []) => {
     this.type = 'INSERT'
     this.table = table
-    this.fields = fields
+    this._addFields(fields)
     this.values = values
     this._cleanLimit()
     return this._interface
@@ -61,11 +61,13 @@ const Query = function(){
   }
 
   this._where = (conditions = []) => {
+    if(typeof conditions === 'string') conditions = [conditions]
     this.where = conditions
     return this._interface
   }
 
   this._andWhere = (conditions = []) => {
+    if(typeof conditions === 'string') conditions = [conditions]
     this.where = [...this.where, ...conditions]
     return this._interface
   }
@@ -76,11 +78,12 @@ const Query = function(){
   }
 
   this._fields = (fields) => {
-    this.fields = fields
+    this._addFields(fields)
     return this._interface
   }
 
   this._having = (having) => {
+    if(typeof having === 'string') having = [having]
     this.having = having
     return this._interface
   }
@@ -97,11 +100,13 @@ const Query = function(){
   }
 
   this._orderBy = (order) => {
+    if(typeof order === 'string') order = [order]
     this.order = order
     return this._interface
   }
 
   this._groupBy = (group) => {
+    if(typeof group === 'string') group = [group]
     this.group = group
     return this._interface
   }
@@ -234,6 +239,16 @@ const Query = function(){
     if(!this.limit || page < 1) return this._interface
     this.howMany = (page - 1) * this.limit // La primera página es la 1
     return this._interface
+  }
+
+  this._addFields = (fields) => {
+    if(typeof fields === 'string'){
+      this.fields = fields.split(',').map(f => f.trim())
+    }else if(Array.isArray(fields)){
+      this.fields = fields
+    }else{
+      throw new Error('Error: invalid fields format')
+    }
   }
 
   this._interface = {
