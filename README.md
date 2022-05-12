@@ -1,11 +1,31 @@
 # Query
- 
-### Todavía en desarrollo
 
 ## Y esto.. por qué?
 Pues por el simple echo de hacerlo :)
 
 # Ejemplos de uso:
+
+**Importación**
+
+**PHP**
+```PHP
+require 'Query.class.php';
+```
+
+**JS**
+```JS
+const Query = require('Query.class.js')
+```
+
+**Vía NPM**
+
+```
+npm i querysqljs
+```
+
+```JS
+const Query = require('querysqljs')
+```
 
 **Instancia**
 
