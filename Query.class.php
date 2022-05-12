@@ -404,8 +404,8 @@ class Query {
    * @return string Consulta
    */
   private function addLimit(){
-    if($this->limit !== null && $this->howMany !== null) $this->query .= ' LIMIT ' . $this->howMany . ', ' . $this->limit;
-    else if($this->limit !== null) $this->query .= ' LIMIT ' . $this->limit;
+    if($this->limit !== null) $this->query .= ' LIMIT ' . $this->limit;
+    if($this->limit !== null && $this->howMany !== null) $this->query .= ', ' . $this->howMany;
     return $this->query;
   }
 
