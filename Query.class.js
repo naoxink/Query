@@ -203,8 +203,17 @@ const Query = function(){
     if(![ 'SELECT', 'UPDATE', 'DELETE' ].includes(this.type)){
       return this.query
     }
-    if(this.where.length > 0){
-      this.query += ` WHERE ${this.where.join(' AND ')}`
+    if((Array.isArray(this.where) && this.where.length > 0) || this._isAssociative(this.where)){
+      this.query += ' WHERE '
+      if(this._isAssociative(this.where)){
+        const flatted = []
+        for(field in this.where){
+          flatted.push(this._getConditionStr(field, this.where[field]));
+        }
+        this.query += flatted.join(' AND ')
+      }else{
+        this.query += this.where.join(' AND ')
+      }
     }
     return this.query
   }
@@ -213,7 +222,7 @@ const Query = function(){
     if(this.type !== 'SELECT'){
       return this.query
     }
-    if(this.having){
+    if(this.having && this.having.length){
       this.query += ` HAVING ${this.having.join(' AND ')}`
     }
     return this.query
@@ -249,6 +258,37 @@ const Query = function(){
     }else{
       throw new Error('Error: invalid fields format')
     }
+  }
+
+
+  this._isAssociative = (values) => {
+    return values instanceof Object
+  }
+
+  this._hasOperator = (value) => {
+    return typeof value === 'string' && (value.includes('=') || value.includes('<') || value.includes('>'))
+  }
+
+  this._getPreparedValue = (value) => {
+    if(typeof value === 'string') return `"${value}"`
+    if(typeof value === 'number') return value
+    if(typeof value === 'boolean') return value ? 'true' : 'false'
+    if(value === null) return 'IS NULL'
+    return value
+  }
+
+  this._getConditionStr = (field, value) => {
+    let valueStr = ''
+    if(this._hasOperator(value)){
+      valueStr = value
+    }else{
+      if(value === null){
+        valueStr += this._getPreparedValue(value)
+      }else{
+        valueStr += `= ${this._getPreparedValue(value)}`
+      }
+    }
+    return `${field} ${valueStr}`
   }
 
   this._interface = {

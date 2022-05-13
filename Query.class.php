@@ -433,11 +433,20 @@ class Query {
    * @return string Consulta
    */
   private function addWhere(){
-    if(!in_array($this->type, [ 'SELECT', 'UPDATE', 'DELETE' ])){
+    if(!in_array($this->type, array( 'SELECT', 'UPDATE', 'DELETE' ))){
       return $this->query;
     }
     if(count($this->where) > 0){
-      $this->query .= ' WHERE ' . implode(' AND ', $this->where);
+      $this->query .= ' WHERE ';
+      if($this->isAssociative($this->where)){
+        $flatted = [];
+        foreach($this->where as $field => $value){
+          $flatted[] = $this->getConditionStr($field, $value);
+        }
+        $this->query .= implode(' AND ', $flatted);
+      }else{
+        $this->query .= implode(' AND ', $this->where);
+      }
     }
     return $this->query;
   }
@@ -447,7 +456,7 @@ class Query {
    * @return string Consulta
    */
   private function addHaving(){
-    if($this->type !== 'SELECT'){
+    if($this->type !== 'SELECT' || !is_array($this->having) || !count($this->having)){
       return $this->query;
     }
     $this->query .= ' HAVING ' . implode(' AND ', $this->having);
@@ -492,6 +501,63 @@ class Query {
     }else{
       throw new Exception("Error: invalid fields format", 1);
     }
+  }
+
+  /**
+   * Indica si es un array asociativo teniendo en cuenta
+   * que todas sus keys son de tipo string
+   * @param  array   $values Array de valores
+   * @return boolean
+   */
+  private function isAssociative($values){
+    if(!is_array($values) || !count($values)){
+      return false;
+    }
+    $keys = array_keys($values);
+    return count(array_filter($keys, function($k) { return is_string($k); })) > 0;
+  }
+
+  /**
+   * Comprueba si un valor (string) contiene un operador
+   * @param  string  $value Valor
+   * @return boolean
+   */
+  private function hasOperator($value){
+    return strpos($value, '=') !== false ||
+           strpos($value, '<') !== false ||
+           strpos($value, '>') !== false;
+  }
+
+  /**
+   * Genera y devuelve en string el valor indicado
+   * @param  string $value Valor
+   * @return string
+   */
+  private function getPreparedValue($value){
+    if(is_string($value)) return '"' . $value . '"';
+    if(is_numeric($value)) return $value;
+    if(is_bool($value)) return $value ? 'true' : 'false';
+    if(is_null($value)) return 'IS NULL';
+  }
+
+  /**
+   * Genera una condición según el campo y el valor
+   * @param  string $field Campo
+   * @param  string $value valor
+   * @return string
+   */
+  private function getConditionStr($field, $value){
+    $valueStr = '';
+    if($this->hasOperator($value)){
+      $valueStr = $value;
+    }else{
+      if(is_null($value)){
+        $valueStr .= $this->getPreparedValue($value);
+      }else{
+        $valueStr .= '= ' . $this->getPreparedValue($value);
+      }
+    }
+    return $field . ' ' . $valueStr;
   }
 
 } // Fin class Query

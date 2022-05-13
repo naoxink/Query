@@ -1,6 +1,6 @@
 {
   "name": "querysqljs",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "description": "Make your SQL queries easier!",
   "main": "Query.class.js",
   "scripts": {
